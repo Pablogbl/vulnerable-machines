@@ -1,3 +1,4 @@
+# injection
 
 En este writeup comprometemos una máquina Linux desplegada en Docker, partiendo de una enumeración de puertos hasta conseguir una shell de root. El recorrido pasa por un login web vulnerable a inyección SQL, la reutilización de las credenciales obtenidas contra SSH y una escalada de privilegios a través del binario `env`.
 
@@ -9,7 +10,7 @@ El objetivo no es solo llegar a root, sino entender cada paso: por qué la inyec
 
 Al levantar el contenedor obtenemos la IP de la máquina, que será nuestro objetivo durante todo el ejercicio.
 
-![[Pasted image 20260703185411.png]]
+![](<imagenes/Pasted image 20260703185411.png>)
 
 ---
 
@@ -17,7 +18,7 @@ Al levantar el contenedor obtenemos la IP de la máquina, que será nuestro obje
 
 Con la IP identificada, lanzamos un escaneo de puertos para descubrir qué servicios expone la máquina. El escaneo revela dos puertos abiertos: el 22 (SSH) y el 80 (HTTP).
 
-![[Pasted image 20260703185926.png]]
+![](<imagenes/Pasted image 20260703185926.png>)
 
 Esto nos deja dos frentes: un servicio web sobre el que empezar a trabajar y un acceso remoto por SSH que probablemente aprovechemos más adelante.
 
@@ -27,7 +28,7 @@ Esto nos deja dos frentes: un servicio web sobre el que empezar a trabajar y un 
 
 Abrimos el puerto 80 en el navegador y nos encontramos con una pantalla de login, que se convierte en el primer punto de entrada a atacar.
 
-![[Pasted image 20260703190139.png]]
+![](<imagenes/Pasted image 20260703190139.png>)
 
 ---
 
@@ -41,11 +42,11 @@ Empezamos probando una inyección SQL basada en `UNION` para comprobar si el log
 
 La inyección devuelve un error: el número de columnas indicado no coincide con el de la consulta original.
 
-![[Pasted image 20260703191745.png]]
+![](<imagenes/Pasted image 20260703191745.png>)
 
 Revisando el código de la página encontramos la pista sobre los campos que intervienen en la consulta, lo que nos confirma que la entrada llega sin sanear a la base de datos.
 
-![[Pasted image 20260703191900.png]]
+![](<imagenes/Pasted image 20260703191900.png>)
 
 Con esa información cambiamos de enfoque: en lugar de un `UNION`, introducimos en el **campo de usuario** un `or 1=1` que hace la condición siempre verdadera, dejando la contraseña comentada (el valor de contraseña puede ser cualquiera):
 
@@ -61,7 +62,7 @@ SELECT ... WHERE name = 'or 1=1-- -' AND passwd = '' AND password = '...'
 
 El resultado es un bypass de autenticación: no solo entramos sin credenciales válidas, sino que la web nos muestra directamente un usuario y su contraseña.
 
-![[Pasted image 20260703192114.png]]
+![](<imagenes/Pasted image 20260703192114.png>)
 
 Las credenciales obtenidas son **Dylan / KJSDFG789FGSDF78**.
 
@@ -71,7 +72,7 @@ Las credenciales obtenidas son **Dylan / KJSDFG789FGSDF78**.
 
 Como la máquina tenía el puerto 22 abierto, probamos las credenciales de Dylan contra el servicio SSH. La reutilización funciona y obtenemos una shell en el sistema.
 
-![[Pasted image 20260703192618.png]]
+![](<imagenes/Pasted image 20260703192618.png>)
 
 ---
 
@@ -79,15 +80,15 @@ Como la máquina tenía el puerto 22 abierto, probamos las credenciales de Dylan
 
 Ya dentro de la máquina, enumeramos permisos `sudo`, grupos y binarios en busca de una vía de escalada. La enumeración revela el binario `env` como candidato.
 
-![[Pasted image 20260703193123.png]]
+![](<imagenes/Pasted image 20260703193123.png>)
 
 Consultamos la ficha de `env` en GTFOBins, que documenta el comando concreto para abusar de este binario y obtener una shell privilegiada.
 
-![[Pasted image 20260703193358.png]]
+![](<imagenes/Pasted image 20260703193358.png>)
 
 Ejecutamos el comando indicado en la terminal y obtenemos una shell con privilegios de root, completando el compromiso de la máquina.
 
-![[Pasted image 20260703193519.png]]
+![](<imagenes/Pasted image 20260703193519.png>)
 
 ---
 
