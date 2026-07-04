@@ -10,7 +10,7 @@ El objetivo no es solo llegar a root, sino entender cada paso: por qué enumerar
 
 Como siempre, lo primero es lanzar un escaneo de puertos de la máquina para ver qué servicios expone. El escaneo muestra el puerto 22 (SSH) abierto.
 
-![[Pasted image 20260704173218.png]]
+![](<imagenes/Pasted image 20260704173218.png>)
 
 Con SSH como punto de entrada, el trabajo se centra en él: primero averiguar qué usuarios son válidos y después intentar autenticarnos.
 
@@ -20,15 +20,15 @@ Con SSH como punto de entrada, el trabajo se centra en él: primero averiguar qu
 
 Abrimos Metasploit y buscamos módulos de enumeración de SSH.
 
-![[Pasted image 20260704174222.png]]
+![](<imagenes/Pasted image 20260704174222.png>)
 
 Aparecen varios; el que nos interesa es la opción 4. La seleccionamos y configuramos el módulo, incluyendo el parámetro `user_file` con la lista de usuarios que se van a probar.
 
-![[Pasted image 20260704174945.png]]
+![](<imagenes/Pasted image 20260704174945.png>)
 
 Con el módulo configurado, lanzamos la ejecución con `run`.
 
-![[Pasted image 20260704175011.png]]
+![](<imagenes/Pasted image 20260704175011.png>)
 
 ---
 
@@ -36,7 +36,7 @@ Con el módulo configurado, lanzamos la ejecución con `run`.
 
 La ejecución devuelve un buen número de usuarios válidos. Entre ellos aparece `root`, que es el objetivo más interesante, así que lo atacamos con Hydra para intentar averiguar su contraseña.
 
-![[Pasted image 20260704175404.png]]
+![](<imagenes/Pasted image 20260704175404.png>)
 
 Hydra consigue recuperar la contraseña de `root` (visible en la captura).
 
@@ -46,7 +46,7 @@ Hydra consigue recuperar la contraseña de `root` (visible en la captura).
 
 Con la contraseña obtenida, nos conectamos por SSH directamente como `root`.
 
-![[Pasted image 20260704175702.png]]
+![](<imagenes/Pasted image 20260704175702.png>)
 
 Ya estamos dentro como `root`, con lo que la máquina queda comprometida por completo y damos el ejercicio por finalizado.
 
