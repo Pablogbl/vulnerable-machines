@@ -5,6 +5,8 @@
 **Dificultad:** Media  
 **Tipo:** Web exploitation  
 
+🔗 [Ver walkthrough (PDF)](https://pablogbl.github.io/vulnerable-machines/dockerlabs/chocolatefire/Chocolate%20Fire.pdf)
+
 ---
 
 ## 🧭 Enumeración
