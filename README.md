@@ -17,6 +17,7 @@ No busco hacer guías perfectas ni copiar soluciones. El objetivo es practicar, 
 | [injection](dockerlabs/Injection) | DockerLabs | Web Exploitation (SQL Injection) | Bypass de autenticación por SQLi, reutilización de credenciales, escalada con `env` (GTFOBins) |
 | [ChocolateFire](dockerlabs/chocolatefire) | DockerLabs | Web Exploitation | Openfire 4.7.4, CVE-2023-32315, bypass de autenticación |
 | [BreakMySSH](dockerlabs/Breakmyssh) | DockerLabs | Enumeración y fuerza bruta SSH | Enumeración de usuarios SSH con Metasploit, fuerza bruta con Hydra |
+| [TheDog](dockerlabs/thedog) | DockerLabs | Web Exploitation (Apache 2.4.49) & Privilege Escalation | Apache 2.4.49 RCE, esteganografía (stegsnow), inyección de comandos, credenciales hardcodeadas |
 
 ---
 
