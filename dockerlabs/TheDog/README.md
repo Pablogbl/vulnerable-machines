@@ -4,7 +4,7 @@
 **OS:** Linux  
 **Category:** Web Exploitation (Apache 2.4.49) & Privilege Escalation
 
-🔗 [Ver como web](https://pablogbl.github.io/vulnerable-machines/dockerlabs/TheDog/) · [Ver walkthrough como web](https://pablogbl.github.io/vulnerable-machines/dockerlabs/TheDog/WALKTHROUGH.html)
+🔗 [Ver como web](https://pablogbl.github.io/vulnerable-machines/dockerlabs/TheDog/) · [Ver walkthrough como web](https://pablogbl.github.io/vulnerable-machines/dockerlabs/TheDog/TheDog.html)
 
 ---
 
