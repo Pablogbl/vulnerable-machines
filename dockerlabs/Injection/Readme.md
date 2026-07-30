@@ -4,6 +4,8 @@
 **OS:** Linux  
 **Category:** Web Exploitation (SQL Injection)
 
+🔗 [Ver walkthrough como web](https://pablogbl.github.io/vulnerable-machines/dockerlabs/Injection/Writeup%20maquina%20Injection.html)
+
 ---
 
 ## Overview
